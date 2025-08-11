@@ -1,9 +1,9 @@
 import { Room, Client } from "@colyseus/core";
-import { MyRoomState } from "./schema/MyRoomState";
+import { MatchRoomState } from "./schema/MatchRoomState";
 
-export class MyRoom extends Room<MyRoomState> {
+export class MatchRoom extends Room<MatchRoomState> {
   maxClients = 4;
-  state = new MyRoomState();
+  state = new MatchRoomState();
 
   onCreate(options: any) {
     this.onMessage("type", (client, message) => {
