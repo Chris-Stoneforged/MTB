@@ -11,7 +11,7 @@
     "start": "tsx watch src/index.ts",
     "build": "npm run clean && tsc",
     "clean": "rimraf build",
-    "schema-gen": "npx schema-codegen src/rooms/schema/* --csharp --output ../mtb-client/Assets/Scripts/Schema --namespace MTB.Game.Schema"
+    "schema-gen": "npx schema-codegen src/rooms/**/schema/* --csharp --output ../mtb-client/Assets/Scripts/Schema --namespace MTB.Game.Schema"
   },
   "author": "",
   "license": "UNLICENSED",

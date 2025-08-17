@@ -3,4 +3,5 @@ import { Player } from "./Player";
 
 export class MatchRoomState extends Schema {
   @type({ map: Player }) players: MapSchema<Player> = new MapSchema<Player>();
+  @type("string") currentTurn: string = "";
 }

@@ -18,5 +18,8 @@ namespace MTB.Game.Schema {
 public MatchRoomState() { }
 		[Type(0, "map", typeof(MapSchema<Player>))]
 		public MapSchema<Player> players = null;
+
+		[Type(1, "string")]
+		public string currentTurn = default(string);
 	}
 }
