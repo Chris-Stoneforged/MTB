@@ -8,18 +8,24 @@ namespace MTB.Game
     {
         [SerializeField] private string _serverEndpoint;
 
+        private ColyseusClient _client;
+        private ColyseusRoom<NoState> _queueRoom;
+
         public async void Start()
         {
-            var client = new ColyseusClient(_serverEndpoint);
-            var room = await client.JoinOrCreate<MatchRoomState>("match_room");
-            
-            Debug.Log("Joined the room!");
-            room.OnError += RoomOnOnError;
+            _client = new ColyseusClient(_serverEndpoint);
+            _queueRoom = await _client.JoinOrCreate("lobby_room");
+            _queueRoom.OnMessage<ColyseusMatchMakeResponse>("seat", OnSeatReservationReceived);
+
+            Debug.Log("Joined the queue!");
         }
 
-        private void RoomOnOnError(int code, string message)
+        private async void OnSeatReservationReceived(ColyseusMatchMakeResponse reservation)
         {
-            Debug.LogError($"{code}: {message}");
+            Debug.Log("Got seat");
+            var matchRoom = await _client.ConsumeSeatReservation<MatchRoomState>(reservation);
+            await _queueRoom.Send("confirm");
+            Debug.Log("Joined the match!");
         }
     }
 }

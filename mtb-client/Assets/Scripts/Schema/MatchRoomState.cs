@@ -6,16 +6,16 @@
 // 
 
 using Colyseus.Schema;
+#if UNITY_5_3_OR_NEWER
+using UnityEngine.Scripting;
+#endif
 
-namespace MTB.Game.Schema 
-{
-	public partial class MatchRoomState : Colyseus.Schema.Schema 
-	{
-		public MatchRoomState()
-		{
-			
-		}
-		
+namespace MTB.Game.Schema {
+	public partial class MatchRoomState : Colyseus.Schema.Schema {
+#if UNITY_5_3_OR_NEWER
+[Preserve]
+#endif
+public MatchRoomState() { }
 		[Type(0, "map", typeof(MapSchema<Player>))]
 		public MapSchema<Player> players = null;
 	}
