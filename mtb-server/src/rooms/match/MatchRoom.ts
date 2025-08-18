@@ -8,17 +8,11 @@ export class MatchRoom extends Room<MatchRoomState> {
 
   turnOrder: string[];
   turnIndex: number = 0;
+  readyClients: number = 0;
 
   onCreate(options: any) {
     this.onMessage("end_turn", this.onTurnEnded);
-
-    let readyClients: number = 0;
-    this.onMessage("ready", (client: Client) => {
-      readyClients += 1;
-      if (readyClients === this.maxClients) {
-        this.startMatch();
-      }
-    });
+    this.onMessage("ready", this.onClientReady);
   }
 
   onJoin(client: Client, options: any) {
@@ -34,27 +28,36 @@ export class MatchRoom extends Room<MatchRoomState> {
     console.log("room", this.roomId, "disposing...");
   }
 
+  onClientReady = (client: Client) => {
+    this.readyClients += 1;
+    if (this.readyClients === this.maxClients) {
+      this.startMatch();
+    }
+  };
+
   startMatch() {
     this.turnOrder = this.clients.map((client) => client.sessionId);
     this.turnIndex = Math.floor(Math.random() * this.clients.length);
-    this.state.currentTurn = this.turnOrder[this.turnIndex];
 
-    console.log(`Current turn is ${this.state.currentTurn}`);
-    this.clients.getById(this.state.currentTurn).send("turn_started");
+    this.setTurn();
   }
 
-  onTurnEnded(client: Client, message: any) {
-    client.send("turn_ended");
-    this.flipTurn();
-    this.clients.getById(this.state.currentTurn).send("turn_started");
-  }
+  onTurnEnded = (client: Client, message: any) => {
+    if (client.sessionId !== this.state.currentTurn) {
+      client.error(401, "Cannot end turn on another player's turn.");
+      return;
+    }
 
-  flipTurn() {
     this.turnIndex += 1;
     if (this.turnIndex >= this.clients.length) {
       this.turnIndex = 0;
     }
 
+    this.setTurn();
+  };
+
+  setTurn() {
     this.state.currentTurn = this.turnOrder[this.turnIndex];
+    this.broadcast("turn_changed", { currentTurn: this.state.currentTurn });
   }
 }

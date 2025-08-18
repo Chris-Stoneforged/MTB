@@ -1,7 +1,7 @@
-using System;
 using UnityEngine;
 using Colyseus;
 using MTB.Game.Schema;
+using MTB.Game.Utils;
 using UnityEngine.SceneManagement;
 
 namespace MTB.Game
@@ -30,8 +30,8 @@ namespace MTB.Game
         public async void FindMatch()
         {
             _client = new ColyseusClient(_serverEndpoint);
-            _queueRoom = await _client.JoinOrCreate("lobby_room");
-            _queueRoom.OnMessage<ColyseusMatchMakeResponse>("seat", OnSeatReservationReceived);
+            _queueRoom = await _client.JoinOrCreate(Room.LobbyRoom);
+            _queueRoom.OnMessage<ColyseusMatchMakeResponse>(ServerMessage.Seat, OnSeatReservationReceived);
 
             Debug.Log("Joined the queue!");
         }
@@ -44,7 +44,7 @@ namespace MTB.Game
         private async void OnSeatReservationReceived(ColyseusMatchMakeResponse reservation)
         {
             var matchRoom = await _client.ConsumeSeatReservation<MatchRoomState>(reservation);
-            await _queueRoom.Send("confirm");
+            await _queueRoom.Send(ClientMessage.ConfirmSeat);
             _queueRoom = null;
             OnJoinMatch(matchRoom);
         }
@@ -53,8 +53,7 @@ namespace MTB.Game
         {
             Debug.Log("Joined the match!");
             await SceneManager.LoadSceneAsync("Match", LoadSceneMode.Single);
-            var matchManager = GameObject.Find("MatchManager").GetComponent<MatchManager>();
-            matchManager.OnMatchStarted(room);
+            MatchManager.Instance.OnMatchStarted(room);
         }
     }
 }
