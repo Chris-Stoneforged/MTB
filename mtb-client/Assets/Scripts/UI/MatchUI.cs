@@ -12,6 +12,11 @@ public class MatchUI : MonoBehaviour
         MatchManager.TurnChanged += OnTurnChanged;
     }
 
+    private void OnDestroy()
+    {
+        MatchManager.TurnChanged -= OnTurnChanged;
+    }
+
     private void OnTurnChanged(string currentTurn)
     { 
         _endTurnButton.gameObject.SetActive(MatchManager.Instance.IsClientTurn);

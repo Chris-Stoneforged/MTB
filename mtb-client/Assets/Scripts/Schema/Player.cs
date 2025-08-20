@@ -17,6 +17,12 @@ namespace MTB.Game.Schema {
 #endif
 public Player() { }
 		[Type(0, "string")]
-		public string player_name = default(string);
+		public string playerName = default(string);
+
+		[Type(1, "number")]
+		public float maxHealth = default(float);
+
+		[Type(2, "number")]
+		public float currentHealth = default(float);
 	}
 }
